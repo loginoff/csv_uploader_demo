@@ -8,6 +8,7 @@ export default class Uploader extends Component {
         file: null,
         //idle, ready, uploading, uploadComplete, error
         state: 'idle',
+        retry: false,
         progress: 0
     }
 
@@ -18,6 +19,7 @@ export default class Uploader extends Component {
                 this.setState(
                     {error: csvfile.name + ' is not a .csv file',
                     state: 'error',
+                    retry: false,
                     file: null}
                 );
             } else {
@@ -25,6 +27,7 @@ export default class Uploader extends Component {
                     {error: null,
                     state: 'ready',
                     file: csvfile,
+                    retry: false,
                     progress: 0}
                 )
             }
@@ -64,20 +67,22 @@ export default class Uploader extends Component {
         if(evt.target.status !== 200) {
             this.setState({
                 state: 'error',
-                error: evt.target.status + ' ' + evt.target.statusText
+                error: evt.target.status + ' ' + evt.target.statusText,
+                retry: true
             });
             return;
         }
         this.setState({
-            state: 'uploadComplete'
+            state: 'uploadComplete',
+            retry: false
         });
-        console.log('motherfucker');
     }
 
     uploadError = (evt) => {
         switch(evt.type) {
             case "timeout":
                 this.setState({state: 'error',
+                retry: true,
                 error: 'Timeout reached trying to post to ' + evt.target.responseURL});
                 break;
         }
@@ -110,12 +115,14 @@ export default class Uploader extends Component {
             status = (<Progressbar progress={this.state.progress} />)
         }
 
+        let disableButton = this.state.state !== 'ready' && !this.state.retry;
+
         return (
             <div style={style}>
                 <input type="file" id="uploadField" 
                 onChange={this.handleFiles}
                 multiple={false} />
-                <button id="uploadButton" onClick={this.handleUpload} disabled={this.state.state!=='ready'}>Upload</button>
+                <button id="uploadButton" onClick={this.handleUpload} disabled={disableButton}>{this.state.retry ? 'Retry' : 'Upload'}</button>
                 {this.state.progress !==0 && 
                 (<Progressbar progress={this.state.progress} error={this.state.state==='error'}/>)}
                 {this.state.state === 'error' && (
