@@ -15,14 +15,14 @@ export default class Uploader extends Component {
     handleFiles = (event) => {
         if (event.target.files) {
             let csvfile = event.target.files[0];
-            if (csvfile.type !== 'text/csv'){
-                this.setState(
-                    {error: csvfile.name + ' is not a .csv file',
-                    state: 'error',
-                    retry: false,
-                    file: null}
-                );
-            } else {
+            // if (csvfile.type !== 'text/csv'){
+            //     this.setState(
+            //         {error: csvfile.name + ' is not a .csv file',
+            //         state: 'error',
+            //         retry: false,
+            //         file: null}
+            //     );
+            // } else {
                 this.setState(
                     {error: null,
                     state: 'ready',
@@ -30,7 +30,7 @@ export default class Uploader extends Component {
                     retry: false,
                     progress: 0}
                 )
-            }
+            // }
         }
     }
 
