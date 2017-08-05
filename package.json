@@ -6,7 +6,8 @@
   "scripts": {
     "start": "concurrently \"npm run server\" \"npm run client\"",
     "client": "node start-client.js",
-    "server": "node server.js"
+    "server": "node server.js",
+    "test": "jest"
   },
   "author": "",
   "license": "ISC",
@@ -15,5 +16,12 @@
     "concurrently": "^3.5.0",
     "csv": "^1.1.1",
     "express": "^4.15.3"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testPathIgnorePatterns": ["/node_modules/", "/client/"]
+  },
+  "devDependencies": {
+    "jest-cli": "^20.0.4"
   }
 }
