@@ -32,6 +32,9 @@ ObjectTrie.prototype = {
             for (let word of words) {
                 this._addWord(word, obj);
             }
+            //We also need to add the full key without tokenizing
+            let keyval = obj[key].replace(/\W/g, '').toLowerCase();
+            this._addWord(keyval, obj);
         }
         this.objectcount++;
     },
