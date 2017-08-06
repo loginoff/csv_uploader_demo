@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
-import { Search } from 'semantic-ui-react';
-import Axios, {CancelToken} from 'axios';
+import { Input, Table, Icon, Label } from 'semantic-ui-react';
+import Axios, { CancelToken } from 'axios';
 import axiosCancel from 'axios-cancel';
 
-axiosCancel(Axios, {debug: true});
+axiosCancel(Axios, { debug: true });
 
 export default class SearchView extends Component {
     static defaultProps = {
@@ -23,51 +23,82 @@ export default class SearchView extends Component {
                 'Accept': 'application/json'
             },
             method: 'POST'
-        })
+        }),
+        error: ''
     }
 
     requestData = (value) => {
         //We already have a request it progress, cancel it
-        if(this.state.isLoading) {
+        if (this.state.isLoading) {
             Axios.cancel(this.currentRequest);
         }
-        this.currentRequest=value;
+        this.currentRequest = value;
         this.state.axios.post("", {
             query: value,
-        },{requestId: value}).then(res => {
-            let matches = res.data.results.slice(0,30);
-            this.setState({matches: matches, isLoading: false});
+        }, { requestId: value }).then(res => {
+            let matches = res.data.results.slice(0, 30);
+            this.setState({ matches: matches, isLoading: false, error: '' });
         }).catch(err => {
-            console.log('good old error');
-            console.log(err);
+            this.setState({ error: err.message, isLoading: false })
         });
     }
 
     handleSearchChange = (e, { value }) => {
-        if(value) {
+        if (value) {
             this.requestData(value);
-            this.setState({value: value, isLoading: true});
+            this.setState({ value: value, isLoading: true });
         } else {
-            this.setState({value: value, isLoading: false});
+            this.setState({ value: value, isLoading: false, matches: [] });
         }
     }
 
-    renderResult = (props) => {
+    renderMatch = (match,i) => {
         return (
-            <div key={props.id} id={'result-' + props.id} >
-                <p>{props.name}</p>
-                <p>{props.address}</p>
-            </div>
+            <Table.Row key={match.id} id={'result-' + i}>
+                <Table.Cell>
+                    {match.id}
+                </Table.Cell>
+                <Table.Cell>
+                    {match.name}
+                </Table.Cell>
+                <Table.Cell>
+                    {match.age}
+                </Table.Cell>
+                <Table.Cell>
+                    {match.address}
+                </Table.Cell>
+                <Table.Cell>
+                    <Label color={match.team.toLowerCase()}>{match.team}</Label>
+                </Table.Cell>
+            </Table.Row>
         )
     }
     render() {
         return (
-            <Search
-                loading={this.state.isLoading}
-                value={this.state.value}
-                results={this.state.matches}
-                onSearchChange={this.handleSearchChange}
-                resultRenderer={this.renderResult} />
+            <div>
+                <Input
+                    id='searchField'
+                    icon={<Icon name='user' />}
+                    loading={this.state.isLoading}
+                    onChange={this.handleSearchChange}
+                    error={this.state.error!=''}
+                />
+                <Table>
+                    <Table.Header>
+                        <Table.Row>
+                            <Table.HeaderCell>Id</Table.HeaderCell>
+                            <Table.HeaderCell>Name</Table.HeaderCell>
+                            <Table.HeaderCell>Age</Table.HeaderCell>
+                            <Table.HeaderCell>Address</Table.HeaderCell>
+                            <Table.HeaderCell>Team</Table.HeaderCell>
+                        </Table.Row>
+                    </Table.Header>
+                    <Table.Body>
+                        {this.state.matches.map(this.renderMatch)}
+                    </Table.Body>
+                </Table>
+            </div>
+
         )
     }
 }
