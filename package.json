@@ -12,6 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "body-parser": "^1.17.2",
     "busboy": "^0.2.14",
     "concurrently": "^3.5.0",
     "csv": "^1.1.1",
@@ -19,7 +20,10 @@
   },
   "jest": {
     "testEnvironment": "node",
-    "testPathIgnorePatterns": ["/node_modules/", "/client/"]
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/client/"
+    ]
   },
   "devDependencies": {
     "jest-cli": "^20.0.4"
