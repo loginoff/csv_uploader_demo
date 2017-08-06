@@ -1,36 +1,38 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import Progressbar from '../progressbar';
+import { Input, Icon, Button, Progress } from 'semantic-ui-react';
 
 export default class Uploader extends Component {
     state = {
         error: null,
         file: null,
-        //idle, ready, uploading, uploadComplete, error
+        //idle, ready, retry, uploading, uploadComplete, error
         state: 'idle',
-        retry: false,
         progress: 0
     }
 
     handleFiles = (event) => {
         if (event.target.files) {
             let csvfile = event.target.files[0];
-            // if (csvfile.type !== 'text/csv'){
-            //     this.setState(
-            //         {error: csvfile.name + ' is not a .csv file',
-            //         state: 'error',
-            //         retry: false,
-            //         file: null}
-            //     );
-            // } else {
+            if (csvfile.type !== 'text/csv') {
                 this.setState(
-                    {error: null,
-                    state: 'ready',
-                    file: csvfile,
-                    retry: false,
-                    progress: 0}
+                    {
+                        error: csvfile.name + ' is not a .csv file',
+                        state: 'error',
+                        file: null
+                    }
+                );
+            } else {
+                this.setState(
+                    {
+                        error: null,
+                        state: 'ready',
+                        file: csvfile,
+                        progress: 0
+                    }
                 )
-            // }
+            }
         }
     }
 
@@ -50,21 +52,21 @@ export default class Uploader extends Component {
         formData.append("csvfile", this.state.file);
         request.send(formData);
 
-        this.setState({state: 'uploading', progress: 0});
+        this.setState({ state: 'uploading', progress: 0 });
     }
 
     displayProgress = (event) => {
         if (event.lengthComputable) {
-            this.setState({progress: event.loaded * 100 / event.total});
+            this.setState({ progress: event.loaded * 100 / event.total });
         }
     }
 
     uploadSuccess = (evt) => {
-        if(evt.type !== 'load') {
+        if (evt.type !== 'load') {
             console.log(evt);
         }
 
-        if(evt.target.status !== 200) {
+        if (evt.target.status !== 200) {
             this.setState({
                 state: 'error',
                 error: evt.target.status + ' ' + evt.target.statusText,
@@ -79,57 +81,44 @@ export default class Uploader extends Component {
     }
 
     uploadError = (evt) => {
-        switch(evt.type) {
+        switch (evt.type) {
             case "timeout":
-                this.setState({state: 'error',
-                retry: true,
-                error: 'Timeout reached trying to post to ' + evt.target.responseURL});
+                this.setState({
+                    state: 'error',
+                    retry: true,
+                    error: 'Timeout reached trying to post to ' + evt.target.responseURL
+                });
                 break;
         }
         console.log(evt);
     }
 
     render() {
-        let style = {
-            border: 'solid 1px',
-            maxWidth: '50%'
-        };
-
-        let errorStyle = {
-            color: 'red'
+        let loading = this.state.state === 'uploading';
+        let disableButton = !(this.state.state === 'retry' || this.state.state === 'ready');
+        let error = this.state.state === 'error';
+        let buttonText = 'Upload';
+        switch (this.state.state) {
+            case 'uploadComplete':
+                buttonText = 'Upload complete!';
+                break;
+            case 'retry':
+                buttonText = 'Retry?';
+                break;
         }
 
-        let status;
-        if (this.state.error && this.state.progress != 0) {
-            status = (
-                <div>
-                <Progressbar error={true} progress={this.state.progress} />
-                <div style={{color: 'red'}}>{this.state.error}</div>
-                </div>
-            );
-        } else if (this.state.error) {
-            status = (
-                <div style={{color: 'red'}}>{this.state.error}</div>
-            );
-        } if (this.state.progress != 0) {
-            status = (<Progressbar progress={this.state.progress} />)
-        }
-
-        let disableButton = this.state.state !== 'ready' && !this.state.retry;
 
         return (
-            <div style={style}>
-                <input type="file" id="uploadField" 
-                onChange={this.handleFiles}
-                multiple={false} />
-                <button id="uploadButton" onClick={this.handleUpload} disabled={disableButton}>{this.state.retry ? 'Retry' : 'Upload'}</button>
-                {this.state.progress !==0 && 
-                (<Progressbar progress={this.state.progress} error={this.state.state==='error'}/>)}
-                {this.state.state === 'error' && (
-                    <div style={errorStyle}>{this.state.error}</div>
-                )}
-                {this.state.state === 'uploadComplete' && (
-                    <div>Successfully uploaded {this.state.file.name}</div>
+            <div>
+                <Input type="file" id="uploadField"
+                    onChange={this.handleFiles}
+                    multiple={false}
+                    icon={<Icon name='file text outline' />} />
+                <Button id="uploadButton" color='linkedin' loading={loading} negative={error} positive={this.state.state === 'uploadComplete'} attached='top' fluid={true} onClick={this.handleUpload} disabled={disableButton}>{buttonText}</Button>
+                {(loading || error) && (
+                    <Progress percent={this.state.progress} error={error} active>
+                        {this.state.error}
+                    </Progress>
                 )}
             </div>
         );

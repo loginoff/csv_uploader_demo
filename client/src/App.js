@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import Uploader from './uploader';
+import SearchView from './search';
+import { Segment } from 'semantic-ui-react';
 
 class App extends Component {
   render() {
@@ -18,7 +20,20 @@ class App extends Component {
       </div>
       */
     return (
-      <Uploader />
+      <Segment.Group textAlign="center" compact={true}>
+        <Segment.Group>
+        <Segment>CSV Uploader</Segment>
+          <Segment>
+            <Uploader />
+          </Segment>
+        </Segment.Group>
+        <Segment.Group>
+          <Segment>Searcher</Segment>
+          <Segment>
+            <SearchView />
+          </Segment>
+        </Segment.Group>
+      </Segment.Group>
     );
   }
 }
