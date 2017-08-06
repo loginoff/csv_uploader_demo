@@ -8,17 +8,18 @@ function TrieNode() {
  * to index on the objects.
  * @param { List } object - an optional list of object to index inside the trie
  */
-function ObjectTrie(index_keys, objects) {
+function ObjectTrie(options) {
     this.root = new TrieNode('');
     this.objectcount = 0;
-    this.index_keys = index_keys.constructor === String ? [index_keys] : index_keys;
-
-    //We process any objects passed to the constructor
-    if (objects && objects.constructor === Array) {
-        for (let i = 0; i < objects.length; i++) {
-            this.addObject(objects[i]);
-        }
+    if ('indexKeys' in options) {
+        let index_keys = options['indexKeys'];
+        this.index_keys = index_keys.constructor === String ? [index_keys] : index_keys;
+    } else {
+        throw new Error("'indexKeys' has to be defined");
     }
+
+    this.limitQueryResults = options['limitQueryResults'];
+    this.keyProcessingFunc = options['keyProcessingFunc'] || this._tokenizeStringIntoWords;
 }
 
 ObjectTrie.prototype = {
@@ -27,7 +28,7 @@ ObjectTrie.prototype = {
     //Processes and adds an object to the trie
     addObject: function (obj) {
         for (let key of this.index_keys) {
-            let words = this._tokenizeStringIntoWords(obj[key]);
+            let words = this.keyProcessingFunc(obj[key]);
             for (let word of words) {
                 this._addWord(word, obj);
             }
@@ -51,14 +52,21 @@ ObjectTrie.prototype = {
             }
         }
 
+        let limit = this.limitQueryResults;
+        console.log('limit', limit);
         //If there exists a node corresponding to the last letter of the prefix,
         //we gather all objects from the subtree starting with this node.
-        if(node) {
+        if (node) {
             function dfs(n) {
-                if(n.objs){
-                    results=results.concat(n.objs);
+                if (n.objs) {
+                    for (let i = 0; i < n.objs.length; i++) {
+                        if (results.length >= limit) {
+                            return;
+                        }
+                        results.push(n.objs[i]);
+                    }
                 }
-                for(let child in n.children){
+                for (let child in n.children) {
                     dfs(n.children[child]);
                 }
             }

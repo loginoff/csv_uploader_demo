@@ -7,12 +7,15 @@ const ObjectTrie = require('./trie');
 
 //This is our in memory "database" instance
 csv_db = new DB();
-trie_db = new ObjectTrie(['name', 'address']);
+trie_db = new ObjectTrie({
+    indexKeys: ['name', 'address'],
+    limitQueryResults: 20
+});
 
 fs = require('fs');
 fs.createReadStream('/home/martinl/Downloads/testdata.csv').
-    pipe(csv({columns : ['id','name','age','address','team']})).on('data', 
-    function(data){trie_db.addObject(data)});
+    pipe(csv({ columns: ['id', 'name', 'age', 'address', 'team'] })).on('data',
+    function (data) { trie_db.addObject(data) });
 
 const apisrv = express();
 apisrv.set("port", process.env.PORT || 3001);
@@ -55,11 +58,13 @@ apisrv.post("/import", (req, res) => {
 });
 
 apisrv.post("/search", (req, res) => {
+    console.log(req.body);
     if ('query' in req.body) {
         let results = trie_db.queryObject(req.body.query);
         res.status(200).json(
             { 'results': results }
         );
+        console.log(`responded with ${results.length} results`);
         return res.end();
     }
     res.status(500).end();
