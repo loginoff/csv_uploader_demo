@@ -68,7 +68,7 @@ export default class SearchView extends Component {
                     {match.address}
                 </Table.Cell>
                 <Table.Cell>
-                    <Label color={match.team.toLowerCase()}>{match.team}</Label>
+                    <Label color={(match.team==='WHITE') ? 'grey':match.team.toLowerCase()}>{match.team}</Label>
                 </Table.Cell>
             </Table.Row>
         )
@@ -81,8 +81,9 @@ export default class SearchView extends Component {
                     icon={<Icon name='user' />}
                     loading={this.state.isLoading}
                     onChange={this.handleSearchChange}
-                    error={this.state.error!=''}
+                    error={this.state.error!==''}
                 />
+                {(this.state.error!=='') && (<Label color='red' basic pointing="left">Server error!</Label>)}
                 <Table>
                     <Table.Header>
                         <Table.Row>

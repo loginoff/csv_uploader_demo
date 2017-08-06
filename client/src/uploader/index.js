@@ -52,7 +52,7 @@ export default class Uploader extends Component {
         formData.append("csvfile", this.state.file);
         request.send(formData);
 
-        this.setState({ state: 'uploading', progress: 0 });
+        this.setState({ state: 'uploading', progress: 0, error:'' });
     }
 
     displayProgress = (event) => {
@@ -85,18 +85,21 @@ export default class Uploader extends Component {
             case "timeout":
                 this.setState({
                     state: 'error',
-                    retry: true,
                     error: 'Timeout reached trying to post to ' + evt.target.responseURL
                 });
                 break;
         }
+        this.setState({
+            state: 'retry',
+            error: 'Server error'
+        });
         console.log(evt);
     }
 
     render() {
         let loading = this.state.state === 'uploading';
         let disableButton = !(this.state.state === 'retry' || this.state.state === 'ready');
-        let error = this.state.state === 'error';
+        let error = this.state.state === 'error' || this.state.state === 'retry';
         let buttonText = 'Upload';
         switch (this.state.state) {
             case 'uploadComplete':
