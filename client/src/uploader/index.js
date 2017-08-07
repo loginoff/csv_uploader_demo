@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
-import Progressbar from '../progressbar';
 import { Input, Icon, Button, Progress } from 'semantic-ui-react';
 
 export default class Uploader extends Component {
