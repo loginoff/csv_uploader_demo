@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
 import csv_logo from './export_csv-512.png';
 import './App.css';
 import Uploader from './uploader';
