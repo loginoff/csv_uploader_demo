@@ -4,7 +4,8 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "start": "concurrently \"npm run server\" \"npm run client\"",
+    "start": "NODE_ENV=production node server/server.js",
+    "start-dev": "concurrently \"npm run server\" \"npm run client\"",
     "client": "node start-client.js",
     "server": "node server/server.js",
     "test": "jest"

@@ -1,3 +1,4 @@
+const path = require('path');
 const express = require('express');
 const Busboy = require('busboy');
 const csv = require('csv-parse');
@@ -12,11 +13,16 @@ apisrv.set("port", process.env.PORT || 3001);
 
 // Express only serves static assets in production
 if (process.env.NODE_ENV === "production") {
-    apisrv.use(express.static("client/build"));
+    console.log('running production');
+    apisrv.use(express.static(path.resolve(__dirname, '..', 'client/build')));
 }
 
 // The /search path should only deal with JSON
 apisrv.use('/search', bodyParser.json());
+
+apisrv.get('*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, '..', 'client/build', 'index.html'));
+});
 
 apisrv.post("/import", (req, res) => {
     var busboy = new Busboy({ headers: req.headers });
