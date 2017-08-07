@@ -1,4 +1,4 @@
-# Why?k
+# Why?
 
 This repository contains a demo application for implementing a .csv file upload with a Node.js API to provide autocomplete functionality over some fields in the .csv file.
 
@@ -34,7 +34,7 @@ senses for today's web.
 I Plan to refactor ObjectTrie into a resusable library, add more configuration options and tests and maybe even make it a bit more efficient by implementing suffix compression.
 
 
-## Improvements
+## TODO
 
 * Implement proper logging using some kind of framework
 * Refactor ObjectTrie into a library and add feaures like configurable return value sort order, highlighting.
